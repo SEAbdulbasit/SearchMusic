@@ -3,9 +3,10 @@ package com.example.searchmusic.data.network.response
 data class Result(
     val amgArtistId: Int,
     val artistId: Int,
+    val trackId: Long,
     val artistName: String,
     val artistViewUrl: String?,
-    val artworkUrl100: String?,
+    val artworkUrl100: String,
     val artworkUrl60: String?,
     val collectionCensoredName: String?,
     val collectionExplicitness: String?,

@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.example.searchmusic'
-    compileSdk 32
+    compileSdk rootProject.compileSdkVersion
 
     defaultConfig {
         applicationId "com.example.searchmusic"
-        minSdk 30
-        targetSdk 32
+        minSdk rootProject.minSdkVersion
+        targetSdk rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -74,5 +74,8 @@ dependencies {
 
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     kapt "com.google.dagger:hilt-compiler:$hiltVersion"
+
+    implementation "com.github.bumptech.glide:glide:$glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
 
 }

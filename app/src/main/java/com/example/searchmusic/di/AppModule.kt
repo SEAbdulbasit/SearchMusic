@@ -48,7 +48,7 @@ object AppModule {
     @Provides
     @Named("baseUrl")
     fun provideBaseURL(): String {
-        return "https://api.github.com/"
+        return "https://itunes.apple.com/"
 
     }
 

@@ -11,7 +11,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.example.searchmusic.placeholder.PlaceholderContent
 import com.example.searchmusic.databinding.FragmentItemDetailBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ItemDetailFragment : Fragment() {
     private var item: PlaceholderContent.PlaceholderItem? = null
 

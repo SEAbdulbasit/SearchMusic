@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface MusicApiService {
-    @GET("search?entity=musicVideo")
+    @GET("search")
     suspend fun searchForMusic(
         @Query("term") query: String,
         @Query("offset") offSet: Int,

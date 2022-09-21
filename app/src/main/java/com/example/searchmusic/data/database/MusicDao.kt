@@ -11,10 +11,10 @@ import com.example.searchmusic.data.database.model.MusicEntity
 interface MusicDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(repos: List<MusicEntity>)
+    fun insertAll(musicList: List<MusicEntity>)
 
     @Query(
-        "SELECT * FROM music WHERE musicTitle LIKE :query ORDER BY musicTitle DESC"
+        "SELECT * FROM music WHERE musicTitle LIKE :query OR artisName LIKE :query OR albumName LIKE :query ORDER BY musicTitle DESC"
     )
     fun searchMusic(query: String): PagingSource<Int, MusicEntity>
 
