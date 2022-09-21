@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <?xml version="1.0" encoding="utf-8"?><!-- Adding the same root's ID for view binding as other layout configurations -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -14,7 +13,7 @@
 
         <EditText
             android:id="@+id/search_edit_text"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionSearch"
             android:inputType="textNoSuggestions"
@@ -27,7 +26,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/music_list"
             android:name="com.example.searchmusic.ItemListFragment"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layoutManager="LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/load_more"

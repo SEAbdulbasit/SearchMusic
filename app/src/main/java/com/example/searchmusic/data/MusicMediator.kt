@@ -1,5 +1,6 @@
 package com.example.searchmusic.data
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -20,6 +21,7 @@ class MusicMediator(
     private val repository: MusicRepository
 ) : RemoteMediator<Int, MusicEntity>() {
 
+    var lastPageIndex = 0
     override suspend fun initialize(): InitializeAction {
         return InitializeAction.LAUNCH_INITIAL_REFRESH
     }
@@ -28,7 +30,7 @@ class MusicMediator(
         loadType: LoadType,
         state: PagingState<Int, MusicEntity>,
     ): MediatorResult {
-        val page = when (loadType) {
+        var page = when (loadType) {
             LoadType.REFRESH -> {
                 val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
                 remoteKeys?.nextKey?.minus(NETWORK_PAGE_SIZE) ?: Music_STARTING_PAGE_INDEX
@@ -49,21 +51,33 @@ class MusicMediator(
         }
 
         try {
+            if (page < lastPageIndex) {
+                page = lastPageIndex
+            }
+
             val apiResponse =
                 repository.searchForMusic(query = query, offSet = page, state.config.pageSize)
 
             val musicList = apiResponse.results ?: emptyList()
             val endOfPaginationReached = musicList.size < NETWORK_PAGE_SIZE
 
+            Log.d("MusicaMediator", "Items size: ${musicList.size}")
+
             repository.getDataBase().withTransaction {
                 // clear all tables in the database
                 if (loadType == LoadType.REFRESH) {
+                    Log.d("MusicaMediator", "Items size: flushing db")
+
                     repository.clearMusic()
                     repository.clearKeys()
                 }
                 val prevKey =
                     if (page == Music_STARTING_PAGE_INDEX) null else page - NETWORK_PAGE_SIZE
                 val nextKey = if (endOfPaginationReached) null else page + NETWORK_PAGE_SIZE
+
+                lastPageIndex = nextKey ?: 0
+
+                Log.d("MusicaMediator", "Is end of pagination: ${endOfPaginationReached}")
 
                 val keys = musicList.map {
                     MusicKeys(id = it.trackId, prevKey = prevKey, nextKey = nextKey)

@@ -13,12 +13,10 @@ interface MusicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(musicList: List<MusicEntity>)
 
-    @Query(
-        "SELECT * FROM music WHERE musicTitle LIKE :query OR artisName LIKE :query OR albumName LIKE :query ORDER BY musicTitle DESC"
-    )
+    @Query("SELECT * FROM music WHERE musicTitle LIKE :query OR artisName LIKE :query OR albumName LIKE :query ORDER BY timeStamp ASC")
     fun searchMusic(query: String): PagingSource<Int, MusicEntity>
 
-    @Query("DELETE FROM keys")
+    @Query("DELETE FROM music")
     fun clearMusic()
 
 }

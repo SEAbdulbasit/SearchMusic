@@ -50,7 +50,7 @@ class MusicListAdapter(
                         itemDetailFragmentContainer.findNavController()
                             .navigate(R.id.fragment_item_detail, bundle)
                     } else {
-                        itemView.findNavController().navigate(R.id.show_item_detail, bundle)
+                        //   itemView.findNavController().navigate(R.id.show_item_detail, bundle)
                     }
                 }
             }

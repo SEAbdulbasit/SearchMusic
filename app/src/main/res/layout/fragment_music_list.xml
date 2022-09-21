@@ -22,7 +22,7 @@
         android:id="@+id/music_list"
         android:name="com.example.searchmusic.ItemListFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/load_more"
         app:layout_constraintTop_toBottomOf="@id/search_edit_text"

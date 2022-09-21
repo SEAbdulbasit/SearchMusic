@@ -18,7 +18,7 @@ ext {
     minSdkVersion = 15
     targetSdkVersion = 31
     recyclerViewVersion = '1.2.1'
-    pagingVersion = '3.1.0'
+    pagingVersion = '3.1.1'
     retrofitVersion = '2.9.0'
     okhttpLoggingInterceptorVersion = '5.0.0-alpha.10'
     navigation = '2.5.2'
