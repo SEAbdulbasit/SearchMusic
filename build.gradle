@@ -33,4 +33,5 @@ ext {
     coroutines = '1.5.2'
     hiltVersion = '2.43.2'
     glideVersion='4.13.2'
+    swipeToRefresh='1.1.0'
 }

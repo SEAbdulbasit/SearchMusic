@@ -21,7 +21,7 @@ class MusicMediator(
     private val repository: MusicRepository
 ) : RemoteMediator<Int, MusicEntity>() {
 
-    var lastPageIndex = 0
+    private var lastPageIndex = 0
     override suspend fun initialize(): InitializeAction {
         return InitializeAction.LAUNCH_INITIAL_REFRESH
     }

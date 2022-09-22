@@ -56,9 +56,8 @@ class MusicListFragment : Fragment() {
         view: View?
     ) {
         val musicAdapter = MusicListAdapter(view)
-        val header = MusicLoadStateAdapter { musicAdapter.retry() }
 
-        val adapter = musicAdapter.withLoadStateHeaderAndFooter(header = header,
+        val adapter = musicAdapter.withLoadStateFooter(
             footer = MusicLoadStateAdapter { musicAdapter.retry() })
 
         binding.musicList.adapter = adapter
@@ -71,28 +70,15 @@ class MusicListFragment : Fragment() {
             uiState = uiState,
             pagingData = pagingData,
             onScrollChanged = uiActions,
-            header = header
         )
     }
 
     private fun bindSearch(
         uiState: StateFlow<MusicScreenState>, onQueryChanged: (MusicListActions.Search) -> Unit
     ) {
-        binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                updateRepoListFromInput(onQueryChanged)
-                true
-            } else {
-                false
-            }
-        }
-        binding.searchEditText.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                updateRepoListFromInput(onQueryChanged)
-                true
-            } else {
-                false
-            }
+
+        binding.search.setOnClickListener {
+            updateRepoListFromInput(onQueryChanged)
         }
 
         lifecycleScope.launch {
@@ -113,12 +99,12 @@ class MusicListFragment : Fragment() {
 
     private fun bindList(
         musicListAdapter: MusicListAdapter,
-        header: MusicLoadStateAdapter,
         uiState: StateFlow<MusicScreenState>,
         pagingData: Flow<PagingData<MusicUiModel>>,
         onScrollChanged: (MusicListActions.Scroll) -> Unit
     ) {
         binding.btnRetry.setOnClickListener { musicListAdapter.retry() }
+        binding.swipeRefresh.setOnRefreshListener { musicListAdapter.refresh() }
 
         binding.musicList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -150,14 +136,17 @@ class MusicListFragment : Fragment() {
             musicListAdapter.loadStateFlow.collect { loadState ->
                 // Show a retry header if there was an error refreshing, and items were previously
                 // cached OR default to the default prepend state
-                header.loadState =
-                    loadState.mediator?.refresh?.takeIf { it is LoadState.Error && musicListAdapter.itemCount > 0 }
-                        ?: loadState.prepend
 
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && musicListAdapter.itemCount == 0
                 // show empty list
                 binding.emptyList.isVisible = isListEmpty
+
+                //only show swipe refreshing on
+                if (loadState.mediator?.refresh != LoadState.Loading)
+                    binding.swipeRefresh.isRefreshing =
+                        loadState.mediator?.refresh is LoadState.Loading
+
                 // Only show the list if refresh succeeds, either from the the local db or the remote.
                 binding.musicList.isVisible =
                     loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
@@ -166,13 +155,16 @@ class MusicListFragment : Fragment() {
                     loadState.mediator?.refresh is LoadState.Error && musicListAdapter.itemCount == 0
 
                 // Show loading spinner during initial load or refresh.
-                binding.initialLoader.isVisible = loadState.mediator?.refresh is LoadState.Loading
+                binding.initialLoader.isVisible =
+                    loadState.mediator?.refresh is LoadState.Loading && !(binding.swipeRefresh.isRefreshing)
+
                 val errorState = loadState.source.append as? LoadState.Error
                     ?: loadState.source.prepend as? LoadState.Error
                     ?: loadState.append as? LoadState.Error ?: loadState.prepend as? LoadState.Error
                 errorState?.let {
+                    it.error.printStackTrace()
                     Toast.makeText(
-                        context, "\uD83D\uDE28 Wooops ${it.error}", Toast.LENGTH_LONG
+                        context, "Something went wrong", Toast.LENGTH_LONG
                     ).show()
                 }
             }
