@@ -1,11 +1,9 @@
 package com.example.searchmusic.presentation.musiclist
 
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -16,7 +14,6 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.FragmentMusicListBinding
-import com.example.searchmusic.presentation.MusicListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

@@ -6,13 +6,12 @@
     app:startDestination="@id/fragment_item_detail">
     <fragment
         android:id="@+id/fragment_item_detail"
-        android:name="com.example.searchmusic.ItemDetailFragment"
+        android:name="com.example.searchmusic.presentation.musicdetail.MusicDetailFragment"
         android:label="@string/title_item_detail"
         tools:layout="@layout/fragment_item_detail">
         <argument
             android:name="item_id"
-            android:defaultValue=""
-            app:argType="string" />
+            app:argType="long" />
     </fragment>
 
 </navigation>

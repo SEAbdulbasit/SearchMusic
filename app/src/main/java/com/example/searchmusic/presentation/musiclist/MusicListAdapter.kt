@@ -1,68 +1,55 @@
-package com.example.searchmusic.presentation
+package com.example.searchmusic.presentation.musiclist
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.searchmusic.ItemDetailFragment
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.MusicListContentBinding
-import com.example.searchmusic.placeholder.PlaceholderContent
-import com.example.searchmusic.presentation.musiclist.MusicUiModel
+import com.example.searchmusic.presentation.musicdetail.MusicDetailFragment
 
 class MusicListAdapter(
     private val itemDetailFragmentContainer: View?
 ) : PagingDataAdapter<MusicUiModel, MusicListAdapter.ViewHolder>(
     DIFF_CALLBACK
 ) {
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
         val binding =
             MusicListContentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
-
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-        item?.let {
-            holder.songName.text = item.songName
-            holder.artistName.text = item.artisName
-            Glide.with(holder.image).load(item.imageUrl).into(holder.image);
-
-            with(holder.itemView) {
-                tag = item
-                setOnClickListener { itemView ->
-                    val item = itemView.tag as PlaceholderContent.PlaceholderItem
-                    val bundle = Bundle()
-                    bundle.putString(
-                        ItemDetailFragment.ARG_ITEM_ID, item.id
-                    )
-                    if (itemDetailFragmentContainer != null) {
-                        itemDetailFragmentContainer.findNavController()
-                            .navigate(R.id.fragment_item_detail, bundle)
-                    } else {
-                        //   itemView.findNavController().navigate(R.id.show_item_detail, bundle)
-                    }
-                }
-            }
-
+        getItem(position)?.let {
+            holder.bind(it)
         }
     }
 
-    inner class ViewHolder(binding: MusicListContentBinding) :
+    inner class ViewHolder(private val binding: MusicListContentBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        val songName: TextView = binding.songName
-        val artistName: TextView = binding.artistName
-        val image: ImageView = binding.imageView
+        fun bind(item: MusicUiModel) {
+            binding.songName.text = item.songName
+            binding.artistName.text = item.artisName
+            Glide.with(binding.imageView).load(item.imageUrl).into(binding.imageView)
+
+            binding.root.setOnClickListener {
+                val bundle = Bundle()
+                bundle.putLong(
+                    MusicDetailFragment.ARG_ITEM_ID, item.id
+                )
+                if (itemDetailFragmentContainer != null) {
+                    itemDetailFragmentContainer.findNavController()
+                        .navigate(R.id.fragment_item_detail, bundle)
+                } else {
+                    itemView.findNavController().navigate(R.id.show_item_detail, bundle)
+                }
+            }
+        }
     }
 
     companion object {

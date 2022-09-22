@@ -92,4 +92,4 @@ class MusicListViewModel @Inject constructor(
 
 private const val LAST_QUERY_SCROLLED: String = "last_query_scrolled"
 private const val LAST_SEARCH_QUERY: String = "last_search_query"
-const val DEFAULT_QUERY = ""
+const val DEFAULT_QUERY = "rihanna"
