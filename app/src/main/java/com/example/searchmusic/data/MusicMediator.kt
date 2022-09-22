@@ -88,8 +88,8 @@ class MusicMediator(
                         musicTitle = it.collectionName,
                         artisName = it.artistName,
                         albumName = it.primaryGenreName,
-                        imageUrl = it.artworkUrl100
-
+                        imageUrl = it.artworkUrl100,
+                        previewUrl = it.previewUrl
                     )
                 }
                 repository.insertAll(musicEntitiesList)

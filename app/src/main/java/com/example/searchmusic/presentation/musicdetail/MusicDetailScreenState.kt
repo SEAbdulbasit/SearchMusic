@@ -1,3 +1,6 @@
 package com.example.searchmusic.presentation.musicdetail
 
-data class MusicDetailScreenState(val id: Long)
+import com.example.searchmusic.presentation.musiclist.MusicUiModel
+import com.example.searchmusic.presentation.musiclist.getEmptyMusicUiModel
+
+data class MusicDetailScreenState(val uiMModel: MusicUiModel = getEmptyMusicUiModel())

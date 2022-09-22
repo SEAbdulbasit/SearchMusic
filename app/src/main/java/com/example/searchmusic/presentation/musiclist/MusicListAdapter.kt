@@ -33,14 +33,14 @@ class MusicListAdapter(
     inner class ViewHolder(private val binding: MusicListContentBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: MusicUiModel) {
-            binding.songName.text = item.songName
+            binding.songName.text = item.musicTitle
             binding.artistName.text = item.artisName
             Glide.with(binding.imageView).load(item.imageUrl).into(binding.imageView)
 
             binding.root.setOnClickListener {
                 val bundle = Bundle()
                 bundle.putLong(
-                    MusicDetailFragment.ARG_ITEM_ID, item.id
+                    MusicDetailFragment.ARG_ITEM_ID, item.trackId
                 )
                 if (itemDetailFragmentContainer != null) {
                     itemDetailFragmentContainer.findNavController()
@@ -64,7 +64,7 @@ class MusicListAdapter(
                 override fun areContentsTheSame(
                     oldItem: MusicUiModel, newItem: MusicUiModel
                 ): Boolean {
-                    return oldItem.id == newItem.id
+                    return oldItem.trackId == newItem.trackId
                 }
             }
     }

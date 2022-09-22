@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withResumed
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
@@ -119,17 +120,17 @@ class MusicListFragment : Fragment() {
             notLoading, hasNotScrolledForCurrentSearch, Boolean::and
         ).distinctUntilChanged()
 
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenResumed {
             pagingData.collectLatest(musicListAdapter::submitData)
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenResumed {
             shouldScrollToTop.collect { shouldScroll ->
                 if (shouldScroll) binding.musicList.scrollToPosition(0)
             }
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenResumed {
             musicListAdapter.loadStateFlow.collect { loadState ->
                 // Show a retry header if there was an error refreshing, and items were previously
                 // cached OR default to the default prepend state

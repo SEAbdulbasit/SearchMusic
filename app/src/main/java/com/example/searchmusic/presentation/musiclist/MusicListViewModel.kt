@@ -59,14 +59,7 @@ class MusicListViewModel @Inject constructor(
     }
 
     fun processActions(actions: MusicListActions) {
-        when (actions) {
-            is MusicListActions.Search -> {
-                viewModelScope.launch { actionStateFlow.emit(actions) }
-            }
-            is MusicListActions.Scroll -> {
-                viewModelScope.launch { actionStateFlow.emit(actions) }
-            }
-        }
+        viewModelScope.launch { actionStateFlow.emit(actions) }
     }
 
     override fun onCleared() {
@@ -79,11 +72,12 @@ class MusicListViewModel @Inject constructor(
         repository.getSearchFlow(queryString).map { pagingData ->
             pagingData.map {
                 MusicUiModel(
-                    id = it.trackId,
+                    trackId = it.trackId,
                     artisName = it.artisName,
-                    songName = it.musicTitle,
+                    musicTitle = it.musicTitle,
                     albumName = it.albumName,
-                    imageUrl = it.imageUrl
+                    imageUrl = it.imageUrl,
+                    previewUrl = it.previewUrl
                 )
             }
         }.flowOn(Dispatchers.IO)

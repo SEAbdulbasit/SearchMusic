@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.searchmusic.data.database.model.MusicEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MusicDao {
@@ -18,5 +19,8 @@ interface MusicDao {
 
     @Query("DELETE FROM music")
     fun clearMusic()
+
+    @Query("SELECT * FROM music WHERE trackId == :musicId")
+    fun getMusic(musicId: Long): Flow<MusicEntity>
 
 }

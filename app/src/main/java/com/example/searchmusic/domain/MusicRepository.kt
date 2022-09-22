@@ -13,6 +13,7 @@ interface MusicRepository {
     suspend fun getDataBase(): MusicDatabase
     suspend fun searchForMusic(query: String, offSet: Int, pageSize: Int): SearchResults
     suspend fun insertAll(musicList: List<MusicEntity>)
+    suspend fun getMusic(musicId: Long): Flow<MusicEntity>
     suspend fun searchMusic(query: String): PagingSource<Int, MusicEntity>
     suspend fun clearMusic()
     suspend fun insertAllKeys(remoteKey: List<MusicKeys>)

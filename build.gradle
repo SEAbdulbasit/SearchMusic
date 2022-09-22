@@ -15,7 +15,7 @@ plugins {
 
 ext {
     compileSdkVersion = 31
-    minSdkVersion = 15
+    minSdkVersion = 16
     targetSdkVersion = 31
     recyclerViewVersion = '1.2.1'
     pagingVersion = '3.1.1'
@@ -32,6 +32,7 @@ ext {
     okhttpLoggingInterceptorVersion = '4.9.0'
     coroutines = '1.5.2'
     hiltVersion = '2.43.2'
-    glideVersion='4.13.2'
-    swipeToRefresh='1.1.0'
+    glideVersion = '4.13.2'
+    swipeToRefresh = '1.1.0'
+    expoplayerVersion = '2.18.1'
 }

@@ -8,9 +8,20 @@ data class MusicScreenState(
 
 
 data class MusicUiModel(
-    val id: Long,
-    val songName: String,
+    val trackId: Long,
+    val musicTitle: String,
     val albumName: String,
     val artisName: String,
-    val imageUrl: String
+    val imageUrl: String,
+    val previewUrl: String
 )
+
+fun getEmptyMusicUiModel() =
+    MusicUiModel(
+        trackId = -1,
+        musicTitle = "",
+        albumName = "",
+        artisName = "",
+        imageUrl = "",
+        previewUrl = ""
+    )

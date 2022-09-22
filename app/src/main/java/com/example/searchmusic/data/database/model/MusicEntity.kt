@@ -10,5 +10,6 @@ data class MusicEntity(
     val artisName: String,
     val albumName: String,
     val imageUrl: String,
+    val previewUrl: String,
     val timeStamp: Long = System.currentTimeMillis()
 )

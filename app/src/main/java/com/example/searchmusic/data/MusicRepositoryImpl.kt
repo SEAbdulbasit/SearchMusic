@@ -39,6 +39,10 @@ class MusicRepositoryImpl(
         database.musicDao().insertAll(musicList)
     }
 
+    override suspend fun getMusic(musicId: Long): Flow<MusicEntity> {
+        return database.musicDao().getMusic(musicId)
+    }
+
     override suspend fun searchMusic(query: String): PagingSource<Int, MusicEntity> {
         return database.musicDao().searchMusic(query)
     }
