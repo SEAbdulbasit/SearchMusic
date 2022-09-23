@@ -31,18 +31,6 @@ class MusicDetailFragment : Fragment() {
 
     private val viewModel: MusicDetailViewModel by viewModels()
 
-    var musicPlayed: Long = 0
-    var isPlaying: Boolean = true
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let { argument ->
-            musicPlayed = argument.getLong(MUSIC_PLAYED, 0)
-            isPlaying = argument.getBoolean(IS_PLAYING, true)
-
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -115,18 +103,7 @@ class MusicDetailFragment : Fragment() {
         val mediaItem: MediaItem = MediaItem.fromUri(videoUri)
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
-        exoPlayer.seekTo(musicPlayed)
-        if (isPlaying) {
-            exoPlayer.play()
-        } else {
-            exoPlayer.pause()
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        arguments?.putLong(MUSIC_PLAYED, exoPlayer.currentPosition)
-        arguments?.putBoolean(IS_PLAYING, exoPlayer.isPlaying)
+        exoPlayer.play()
     }
 
     override fun onDestroyView() {
@@ -135,6 +112,3 @@ class MusicDetailFragment : Fragment() {
         _binding = null
     }
 }
-
-private const val MUSIC_PLAYED = "music_played"
-private const val IS_PLAYING = "should_play"
