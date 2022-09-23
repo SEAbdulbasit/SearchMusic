@@ -39,12 +39,6 @@ class MusicDetailViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
             initialValue = MusicDetailScreenState()
         )
-
-        viewModelScope.launch {
-            musicId?.let {
-                actionStateFlow.emit(MusicDetailsActions.GetMusicDetails(it))
-            }
-        }
     }
 
     private suspend fun getMusicDetails(musicId: Long): Flow<MusicUiModel> {

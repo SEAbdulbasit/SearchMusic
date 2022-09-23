@@ -9,12 +9,14 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.withResumed
+import androidx.navigation.findNavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.FragmentMusicListBinding
+import com.example.searchmusic.navigateSafe
+import com.example.searchmusic.presentation.musicdetail.MUSIC_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -37,26 +39,45 @@ class MusicListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val itemDetailFragmentContainer: View? = view.findViewById(R.id.item_detail_nav_container)
-
-        bindState(uiState = viewModel.state,
-            pagingData = viewModel.pagingDataFlow,
-            view = itemDetailFragmentContainer,
-            uiActions = {
+        bindState(
+            uiState = viewModel.state, pagingData = viewModel.pagingDataFlow, uiActions = {
                 viewModel.processActions(it)
-            })
+            }, navigateToDetailsScreen = ::navigateToDetailsPage
+        )
+    }
+
+    private fun navigateToDetailsPage(
+        musicUiModel: MusicUiModel
+    ) {
+        val itemDetailFragmentContainer: View? = view?.findViewById(R.id.item_detail_nav_container)
+        val bundle = Bundle().apply {
+            putLong(
+                MUSIC_ID, musicUiModel.trackId
+            )
+        }
+        if (itemDetailFragmentContainer != null) {
+            navigateSafe(
+                itemDetailFragmentContainer.findNavController(),
+                R.id.fragment_music_detail,
+                bundle
+            )
+        } else {
+            view?.findNavController()?.let { navigateSafe(it, R.id.show_music_detail, bundle) }
+        }
     }
 
     private fun bindState(
         uiState: StateFlow<MusicScreenState>,
         pagingData: Flow<PagingData<MusicUiModel>>,
         uiActions: (MusicListActions) -> Unit,
-        view: View?
+        navigateToDetailsScreen: (MusicUiModel) -> Unit,
     ) {
-        val musicAdapter = MusicListAdapter(view)
+        val musicAdapter = MusicListAdapter(
+            navigateToDetailsScreen
+        )
 
-        val adapter = musicAdapter.withLoadStateFooter(
-            footer = MusicLoadStateAdapter { musicAdapter.retry() })
+        val adapter =
+            musicAdapter.withLoadStateFooter(footer = MusicLoadStateAdapter { musicAdapter.retry() })
 
         binding.musicList.adapter = adapter
 
@@ -141,9 +162,8 @@ class MusicListFragment : Fragment() {
                 binding.emptyList.isVisible = isListEmpty
 
                 //only show swipe refreshing on
-                if (loadState.mediator?.refresh != LoadState.Loading)
-                    binding.swipeRefresh.isRefreshing =
-                        loadState.mediator?.refresh is LoadState.Loading
+                if (loadState.mediator?.refresh != LoadState.Loading) binding.swipeRefresh.isRefreshing =
+                    loadState.mediator?.refresh is LoadState.Loading
 
                 // Only show the list if refresh succeeds, either from the the local db or the remote.
                 binding.musicList.isVisible =
