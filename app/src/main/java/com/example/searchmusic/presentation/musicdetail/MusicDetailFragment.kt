@@ -99,6 +99,11 @@ class MusicDetailFragment : Fragment() {
         binding.epVideoView.player = exoPlayer
     }
 
+    override fun onPause() {
+        super.onPause()
+        exoPlayer.pause()
+    }
+
     private fun play(videoUri: String) {
         val mediaItem: MediaItem = MediaItem.fromUri(videoUri)
         exoPlayer.setMediaItem(mediaItem)
