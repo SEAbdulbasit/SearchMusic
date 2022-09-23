@@ -9,7 +9,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,14 +20,8 @@ class MusicDetailViewModel @Inject constructor(
     private val actionStateFlow = MutableSharedFlow<MusicDetailsActions>()
 
     init {
-        val musicId: Long = savedStateHandle[MUSIC_ID] ?: -1
-
-        val getMusicDetails =
-            actionStateFlow.filterIsInstance<MusicDetailsActions.GetMusicDetails>()
-                .onStart { emit(MusicDetailsActions.GetMusicDetails(musicId)) }
-
-        val musicDetails =
-            getMusicDetails.filter { it.id != -1L }.flatMapLatest { getMusicDetails(it.id) }
+        val musicDetails = savedStateHandle.getStateFlow<Long>(MUSIC_ID, -1).filter { it != -1L }
+            .flatMapLatest { getMusicDetails(it) }
 
         state = musicDetails.map { music ->
             MusicDetailScreenState(
@@ -53,7 +46,6 @@ class MusicDetailViewModel @Inject constructor(
             )
         }.flowOn(Dispatchers.IO)
     }
-
 
     override fun onCleared() {
         savedStateHandle[MUSIC_ID] = state.value.uiMModel.trackId
