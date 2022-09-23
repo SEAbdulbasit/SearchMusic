@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.searchmusic.databinding.FragmentItemDetailBinding
+import com.example.searchmusic.R
+import com.example.searchmusic.databinding.FragmentMusicDetailBinding
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
@@ -23,7 +25,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @AndroidEntryPoint
 class MusicDetailFragment : Fragment() {
 
-    private var _binding: FragmentItemDetailBinding? = null
+    private var _binding: FragmentMusicDetailBinding? = null
     private val binding get() = _binding!!
     private lateinit var exoPlayer: ExoPlayer
 
@@ -32,18 +34,8 @@ class MusicDetailFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentItemDetailBinding.inflate(inflater, container, false)
+        _binding = FragmentMusicDetailBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun setArguments(args: Bundle?) {
-        if (args != null) {
-            super.setArguments(Bundle(args).apply {
-                putBundle("BUNDLE_ARGS", args)
-            })
-        } else {
-            super.setArguments(null)
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,8 +47,7 @@ class MusicDetailFragment : Fragment() {
     private fun bindState(uiState: SharedFlow<MusicDetailScreenState>) {
         lifecycleScope.launchWhenResumed {
             uiState.distinctUntilChanged().collect { musicDetailsState ->
-                bindUiState(musicDetailsState.uiMModel)
-                bindExoPlayer(musicDetailsState.uiMModel)
+                bindScreen(musicDetailsState.uiMModel)
             }
         }
     }
@@ -69,12 +60,33 @@ class MusicDetailFragment : Fragment() {
         }
     }
 
-    private fun bindUiState(uiModel: MusicUiModel) {
-        Glide.with(binding.image).load(uiModel.imageUrl).into(binding.image)
-        binding.musicTitle.text = uiModel.musicTitle
-        binding.artisName.text = uiModel.artisName
-        binding.epVideoView.setShowNextButton(false)
-        binding.epVideoView.setShowPreviousButton(false)
+    private fun bindScreen(uiModel: MusicUiModel) {
+        if (uiModel.artisName.isNotEmpty()) {
+            bindMusicDetail(uiModel)
+            bindExoPlayer(uiModel)
+        } else {
+            bindEmptyState()
+        }
+    }
+
+    private fun bindMusicDetail(uiModel: MusicUiModel) {
+        with(binding) {
+            musicDetailView.isVisible = true
+            Glide.with(image).load(uiModel.imageUrl).placeholder(R.drawable.image_placeholder)
+                .into(image)
+            musicTitle.text = uiModel.musicTitle
+            artisName.text = uiModel.artisName
+            epVideoView.setShowNextButton(false)
+            epVideoView.setShowPreviousButton(false)
+            albumName.text = uiModel.albumName
+        }
+    }
+
+    private fun bindEmptyState() {
+        with(binding) {
+            musicDetailView.isVisible = false
+            musicLogo.isVisible = true
+        }
     }
 
     private fun initializePlayer() {
@@ -92,10 +104,6 @@ class MusicDetailFragment : Fragment() {
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
         exoPlayer.play()
-    }
-
-    companion object {
-        const val ARG_ITEM_ID = "item_id"
     }
 
     override fun onDestroyView() {

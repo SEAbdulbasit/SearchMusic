@@ -33,7 +33,7 @@
                     android:imeOptions="actionSearch"
                     android:inputType="textNoSuggestions"
                     android:maxLines="1"
-                    android:padding="8dp"
+                    android:padding="10dp"
                     android:selectAllOnFocus="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -51,7 +51,6 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/music_list"
-                android:name="com.example.searchmusic.ItemListFragment"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
@@ -65,11 +64,11 @@
                 android:id="@+id/initial_loader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/music_list"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_edit_text" />
+                app:layout_constraintTop_toTopOf="@+id/music_list" />
 
             <ProgressBar
                 android:id="@+id/load_more"

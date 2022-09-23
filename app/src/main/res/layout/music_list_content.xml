@@ -6,16 +6,18 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingStart="16dp"
-    android:paddingTop="16dp"
     android:paddingEnd="16dp">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/image_placeholder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_launcher_background" />
+        app:shapeAppearanceOverlay="@style/roundedImageView" />
 
     <TextView
         android:id="@+id/song_name"
@@ -36,6 +38,16 @@
         app:layout_constraintStart_toStartOf="@+id/song_name"
         app:layout_constraintTop_toBottomOf="@+id/song_name"
         tools:text="Artist Name" />
+
+    <TextView
+        android:id="@+id/album_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="@+id/song_name"
+        app:layout_constraintTop_toBottomOf="@+id/artist_name"
+        tools:text="Album name" />
 
     <View
         android:layout_width="match_parent"

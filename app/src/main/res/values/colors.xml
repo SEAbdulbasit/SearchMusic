@@ -7,5 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="semi_black">#17000000</color>
+    <color name="music_background">#D6D6D6</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="status_color">@color/purple_700</color>
 </resources>
