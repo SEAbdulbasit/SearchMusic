@@ -17,7 +17,6 @@ class MusicDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     val state: StateFlow<MusicDetailScreenState>
-    private val actionStateFlow = MutableSharedFlow<MusicDetailsActions>()
 
     init {
         val musicDetails = savedStateHandle.getStateFlow<Long>(MUSIC_ID, -1).filter { it != -1L }

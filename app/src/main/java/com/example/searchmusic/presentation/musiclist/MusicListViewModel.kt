@@ -9,6 +9,7 @@ import androidx.paging.map
 import com.example.searchmusic.domain.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -62,12 +63,6 @@ class MusicListViewModel @Inject constructor(
         viewModelScope.launch { actionStateFlow.emit(actions) }
     }
 
-    override fun onCleared() {
-        savedStateHandle[LAST_SEARCH_QUERY] = state.value.query
-        savedStateHandle[LAST_QUERY_SCROLLED] = state.value.lastQueryScrolled
-        super.onCleared()
-    }
-
     private suspend fun searchMusic(queryString: String): Flow<PagingData<MusicUiModel>> =
         repository.getSearchFlow(queryString).map { pagingData ->
             pagingData.map {
@@ -81,6 +76,13 @@ class MusicListViewModel @Inject constructor(
                 )
             }
         }.flowOn(Dispatchers.IO)
+
+    override fun onCleared() {
+        savedStateHandle[LAST_SEARCH_QUERY] = state.value.query
+        savedStateHandle[LAST_QUERY_SCROLLED] = state.value.lastQueryScrolled
+        viewModelScope.cancel()
+        super.onCleared()
+    }
 
 }
 

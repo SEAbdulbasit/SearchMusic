@@ -12,11 +12,8 @@ import com.bumptech.glide.Glide
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.FragmentMusicDetailBinding
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,7 +26,19 @@ class MusicDetailFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var exoPlayer: ExoPlayer
 
+    private val KEY_POSITION = "position"
+    private val KEY_AUTO_PLAY = "auto_play"
+
+    private var startAutoPlay = false
+    private var startPosition: Long = 0
+
     private val viewModel: MusicDetailViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        startAutoPlay = savedInstanceState?.getBoolean(KEY_AUTO_PLAY) ?: true
+        startPosition = savedInstanceState?.getLong(KEY_POSITION) ?: 0L
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -52,14 +61,6 @@ class MusicDetailFragment : Fragment() {
         }
     }
 
-    private fun bindExoPlayer(uiMModel: MusicUiModel) {
-        uiMModel.previewUrl.trim().let {
-            if (it.isNotEmpty()) {
-                play(it)
-            }
-        }
-    }
-
     private fun bindScreen(uiModel: MusicUiModel) {
         if (uiModel.artisName.isNotEmpty()) {
             bindMusicDetail(uiModel)
@@ -71,14 +72,21 @@ class MusicDetailFragment : Fragment() {
 
     private fun bindMusicDetail(uiModel: MusicUiModel) {
         with(binding) {
+            musicLogo.isVisible = false
             musicDetailView.isVisible = true
             Glide.with(image).load(uiModel.imageUrl).placeholder(R.drawable.image_placeholder)
                 .into(image)
             musicTitle.text = uiModel.musicTitle
             artisName.text = uiModel.artisName
-            epVideoView.setShowNextButton(false)
-            epVideoView.setShowPreviousButton(false)
             albumName.text = uiModel.albumName
+        }
+    }
+
+    private fun bindExoPlayer(uiMModel: MusicUiModel) {
+        uiMModel.previewUrl.trim().let {
+            if (it.isNotEmpty()) {
+                play(it)
+            }
         }
     }
 
@@ -90,13 +98,18 @@ class MusicDetailFragment : Fragment() {
     }
 
     private fun initializePlayer() {
-        val trackSelector = DefaultTrackSelector(requireContext())
-        val loadControl = DefaultLoadControl()
-        val renderersFactory = DefaultRenderersFactory(requireContext())
+        exoPlayer = ExoPlayer.Builder(requireContext()).build()
+        binding.epAudioView.player = exoPlayer
+        binding.epAudioView.setShowNextButton(false)
+        binding.epAudioView.setShowPreviousButton(false)
+    }
 
-        exoPlayer = ExoPlayer.Builder(requireContext()).setRenderersFactory(renderersFactory)
-            .setLoadControl(loadControl).setTrackSelector(trackSelector).build()
-        binding.epVideoView.player = exoPlayer
+    private fun play(audioUrl: String) {
+        val mediaItem: MediaItem = MediaItem.fromUri(audioUrl)
+        exoPlayer.setMediaItem(mediaItem)
+        exoPlayer.prepare()
+        exoPlayer.seekTo(startPosition)
+        exoPlayer.playWhenReady = startAutoPlay
     }
 
     override fun onPause() {
@@ -104,11 +117,10 @@ class MusicDetailFragment : Fragment() {
         exoPlayer.pause()
     }
 
-    private fun play(videoUri: String) {
-        val mediaItem: MediaItem = MediaItem.fromUri(videoUri)
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.prepare()
-        exoPlayer.play()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_AUTO_PLAY, exoPlayer.playWhenReady)
+        outState.putLong(KEY_POSITION, exoPlayer.currentPosition)
     }
 
     override fun onDestroyView() {

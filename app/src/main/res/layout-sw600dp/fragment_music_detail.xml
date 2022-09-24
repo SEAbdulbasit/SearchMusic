@@ -19,18 +19,19 @@
         android:id="@+id/music_detail_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         tools:context=".ItemDetailHostActivity"
         tools:ignore="MergeRootFrame">
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/ep_video_view"
+        <com.google.android.exoplayer2.ui.PlayerControlView
+            android:id="@+id/ep_audio_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:show_buffering="always"
+            app:show_timeout="0"
             app:shutter_background_color="@color/music_background" />
 
         <com.google.android.material.imageview.ShapeableImageView
@@ -75,9 +76,9 @@
             android:id="@+id/album_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="150dp"
             android:textSize="28sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="30dp"
+            app:layout_constraintBottom_toTopOf="@id/ep_audio_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/artis_name"
