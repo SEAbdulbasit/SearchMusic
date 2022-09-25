@@ -1,6 +1,5 @@
 package com.example.searchmusic.data
 
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -13,12 +12,11 @@ import com.example.searchmusic.domain.MusicRepository
 import retrofit2.HttpException
 import java.io.IOException
 
-const val Music_STARTING_PAGE_INDEX = 0
+const val MUSIC_STARTING_PAGE_INDEX = 0
 
 @OptIn(ExperimentalPagingApi::class)
 class MusicMediator(
-    private val query: String,
-    private val repository: MusicRepository
+    private val query: String, private val repository: MusicRepository
 ) : RemoteMediator<Int, MusicEntity>() {
 
     private var lastPageIndex = 0
@@ -33,7 +31,7 @@ class MusicMediator(
         var page = when (loadType) {
             LoadType.REFRESH -> {
                 val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
-                remoteKeys?.nextKey?.minus(NETWORK_PAGE_SIZE) ?: Music_STARTING_PAGE_INDEX
+                remoteKeys?.nextKey?.minus(NETWORK_PAGE_SIZE) ?: MUSIC_STARTING_PAGE_INDEX
             }
             LoadType.PREPEND -> {
                 val remoteKeys = getRemoteKeyForFirstItem(state)
@@ -44,8 +42,9 @@ class MusicMediator(
             }
             LoadType.APPEND -> {
                 val remoteKeys = getRemoteKeyForLastItem(state)
-                val nextKey = remoteKeys?.nextKey
-                    ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                val nextKey = remoteKeys?.nextKey ?: return MediatorResult.Success(
+                    endOfPaginationReached = remoteKeys != null
+                )
                 nextKey
             }
         }
@@ -68,7 +67,7 @@ class MusicMediator(
                     repository.clearKeys()
                 }
                 val prevKey =
-                    if (page == Music_STARTING_PAGE_INDEX) null else page - NETWORK_PAGE_SIZE
+                    if (page == MUSIC_STARTING_PAGE_INDEX) null else page - NETWORK_PAGE_SIZE
                 val nextKey = if (endOfPaginationReached) null else page + NETWORK_PAGE_SIZE
 
                 lastPageIndex = nextKey ?: 0
@@ -113,16 +112,14 @@ class MusicMediator(
     }
 
     private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, MusicEntity>): MusicKeys? {
-        return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
-            ?.let { music ->
-                repository.getMusicKey(music.trackId)
-            }
+        return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()?.let { music ->
+            repository.getMusicKey(music.trackId)
+        }
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, MusicEntity>): MusicKeys? {
-        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()
-            ?.let { music ->
-                repository.getMusicKey(music.trackId)
-            }
+        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()?.let { music ->
+            repository.getMusicKey(music.trackId)
+        }
     }
 }
