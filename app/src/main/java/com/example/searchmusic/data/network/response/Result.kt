@@ -1,8 +1,8 @@
 package com.example.searchmusic.data.network.response
 
 data class Result(
-    val amgArtistId: Int,
-    val artistId: Int,
+    val amgArtistId: Int?,
+    val artistId: Int?,
     val trackId: Long,
     val artistName: String,
     val artistViewUrl: String?,
@@ -24,3 +24,37 @@ data class Result(
     val trackCount: Int?,
     val wrapperType: String?
 )
+
+fun getResult(
+    trackId: Long,
+    artistName: String,
+    musicTitle: String,
+    previewUrl: String,
+    albumName: String,
+    artWork: String,
+): Result {
+    return Result(
+        amgArtistId = null,
+        artistId = null,
+        trackId = trackId,
+        artistName = artistName,
+        artistViewUrl = null,
+        artworkUrl100 = artWork,
+        artworkUrl60 = null,
+        collectionCensoredName = null,
+        collectionExplicitness = null,
+        collectionId = null,
+        collectionName = musicTitle,
+        collectionPrice = null,
+        collectionViewUrl = null,
+        copyright = null,
+        country = null,
+        currency = null,
+        description = null,
+        previewUrl = previewUrl,
+        primaryGenreName = albumName,
+        releaseDate = null,
+        trackCount = null,
+        wrapperType = null
+    )
+}

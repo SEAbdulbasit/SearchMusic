@@ -61,13 +61,9 @@ class MusicMediator(
             val musicList = apiResponse.results ?: emptyList()
             val endOfPaginationReached = musicList.size < NETWORK_PAGE_SIZE
 
-            Log.d("MusicaMediator", "Items size: ${musicList.size}")
-
             repository.getDataBase().withTransaction {
                 // clear all tables in the database
                 if (loadType == LoadType.REFRESH) {
-                    Log.d("MusicaMediator", "Items size: flushing db")
-
                     repository.clearMusic()
                     repository.clearKeys()
                 }
@@ -76,8 +72,6 @@ class MusicMediator(
                 val nextKey = if (endOfPaginationReached) null else page + NETWORK_PAGE_SIZE
 
                 lastPageIndex = nextKey ?: 0
-
-                Log.d("MusicaMediator", "Is end of pagination: ${endOfPaginationReached}")
 
                 val keys = musicList.map {
                     MusicKeys(id = it.trackId, prevKey = prevKey, nextKey = nextKey)
