@@ -2,7 +2,7 @@ package com.example.searchmusic.data
 
 import com.example.searchmusic.data.database.model.MusicEntity
 import com.example.searchmusic.data.network.response.SearchResults
-import com.example.searchmusic.data.network.response.getResult
+import com.example.searchmusic.data.network.response.getMinDataResult
 
 val listOfMusic = mutableListOf(
     MusicEntity(
@@ -31,7 +31,7 @@ val listOfMusic = mutableListOf(
 
 val searchResults = SearchResults(
     resultCount = 3, results = listOf(
-        getResult(
+        getMinDataResult(
             trackId = 1441154571,
             artistName = "Rihanna",
             previewUrl = "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/a4/16/ce/a416ce10-e861-6e5a-194d-ad4fb2e4cd38/mzaf_7519322396128489319.plus.aac.p.m4a",
@@ -39,7 +39,7 @@ val searchResults = SearchResults(
             albumName = "Good Girl Gone Bad: Reloaded",
             artWork = "https://is4-ssl.mzstatic.com/image/thumb/Music126/v4/2b/c0/81/2bc081c8-25f0-ba43-d451-587a54613778/16UMGIM59202.rgb.jpg/100x100bb.jpg",
         ),
-        getResult(
+        getMinDataResult(
             trackId = 1441154572,
             artistName = "Rihanna",
             previewUrl = "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/a4/16/ce/a416ce10-e861-6e5a-194d-ad4fb2e4cd38/mzaf_7519322396128489319.plus.aac.p.m4a",
@@ -47,7 +47,7 @@ val searchResults = SearchResults(
             albumName = "Good Girl Gone Bad: Reloaded",
             artWork = "https://is4-ssl.mzstatic.com/image/thumb/Music126/v4/2b/c0/81/2bc081c8-25f0-ba43-d451-587a54613778/16UMGIM59202.rgb.jpg/100x100bb.jpg",
         ),
-        getResult(
+        getMinDataResult(
             trackId = 1441154573,
             artistName = "Rihanna",
             previewUrl = "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/a4/16/ce/a416ce10-e861-6e5a-194d-ad4fb2e4cd38/mzaf_7519322396128489319.plus.aac.p.m4a",

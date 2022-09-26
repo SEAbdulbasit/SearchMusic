@@ -2,23 +2,21 @@ package com.example.searchmusic.data
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import app.cash.turbine.test
 import com.example.searchmusic.data.database.MusicDatabase
 import com.example.searchmusic.data.database.model.MusicEntity
 import com.example.searchmusic.data.network.MusicApiService
 import com.example.searchmusic.presentation.musiclist.DEFAULT_QUERY
 import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.net.UnknownHostException
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MusicRepositoryImplTest {
 
     private val database: MusicDatabase = Room.inMemoryDatabaseBuilder(

@@ -11,7 +11,6 @@ enum class RemotePresentationState {
     INITIAL, REMOTE_LOADING, SOURCE_LOADING, PRESENTED
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 fun Flow<CombinedLoadStates>.asRemotePresentationState(): Flow<RemotePresentationState> =
     scan(RemotePresentationState.INITIAL) { state, loadState ->
         when (state) {

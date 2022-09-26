@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.FragmentMusicDetailBinding
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
@@ -32,7 +34,8 @@ class MusicDetailFragment : Fragment() {
     private var startAutoPlay = false
     private var startPosition: Long = 0
 
-    private val viewModel: MusicDetailViewModel by viewModels()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val viewModel: MusicDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +78,7 @@ class MusicDetailFragment : Fragment() {
             musicLogo.isVisible = false
             musicDetailView.isVisible = true
             Glide.with(image).load(uiModel.imageUrl).placeholder(R.drawable.image_placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(image)
             musicTitle.text = uiModel.musicTitle
             artisName.text = uiModel.artisName

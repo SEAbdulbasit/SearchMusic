@@ -6,7 +6,6 @@ data class MusicScreenState(
     val hasNotScrolledForCurrentSearch: Boolean = false
 )
 
-
 data class MusicUiModel(
     val trackId: Long,
     val musicTitle: String,

@@ -25,7 +25,7 @@ data class Result(
     val wrapperType: String?
 )
 
-fun getResult(
+fun getMinDataResult(
     trackId: Long,
     artistName: String,
     musicTitle: String,

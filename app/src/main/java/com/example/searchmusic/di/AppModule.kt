@@ -49,7 +49,6 @@ object AppModule {
     @Named("baseUrl")
     fun provideBaseURL(): String {
         return "https://itunes.apple.com/"
-
     }
 
     @Singleton

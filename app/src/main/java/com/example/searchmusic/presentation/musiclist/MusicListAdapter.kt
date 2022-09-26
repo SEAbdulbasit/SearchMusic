@@ -6,6 +6,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.MusicListContentBinding
 
@@ -33,6 +34,7 @@ class MusicListAdapter(
             binding.artistName.text = item.artisName
             binding.albumName.text = item.albumName
             Glide.with(binding.imageView).load(item.imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .placeholder(R.drawable.image_placeholder).into(binding.imageView)
 
             binding.root.setOnClickListener {
