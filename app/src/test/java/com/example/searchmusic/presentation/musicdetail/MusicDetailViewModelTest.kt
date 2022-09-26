@@ -35,7 +35,7 @@ class MusicDetailViewModelTest {
     }
 
     @Test
-    fun `given ViewModel initialise, then Empty state should be emitted`(): Unit = runBlocking {
+    fun emptyStateShouldBeEmittedWhenViewModelInitialize(): Unit = runBlocking {
         SUT = MusicDetailViewModel(
             repository = repository, savedStateHandle = savedInstanceStateHandle
         )
@@ -51,22 +51,20 @@ class MusicDetailViewModelTest {
     }
 
     @Test
-    fun `give ViewModel initialize, when Music Id is passed, then Music Detail state should be emitted`(): Unit =
-        runTest {
-            coEvery { repository.getMusic(any()) } returns flowOf(musicEntity)
+    fun musicDetailsShouldBeEmittedWhenAValidIdIsPassedForDetails(): Unit = runTest {
+        coEvery { repository.getMusic(any()) } returns flowOf(musicEntity)
 
-            SUT = MusicDetailViewModel(
-                repository = repository,
-                savedStateHandle = savedInstanceStateHandle
-            )
+        SUT = MusicDetailViewModel(
+            repository = repository, savedStateHandle = savedInstanceStateHandle
+        )
 
-            SUT.state.test {
-                val firstItem = awaitItem()
-                savedInstanceStateHandle[MUSIC_ID] = 121
-                val secondState = awaitItem()
-                assertEquals(musicEntity.trackId, secondState.uiMModel.trackId)
-            }
+        SUT.state.test {
+            val firstItem = awaitItem()
+            savedInstanceStateHandle[MUSIC_ID] = 121
+            val secondState = awaitItem()
+            assertEquals(musicEntity.trackId, secondState.uiMModel.trackId)
         }
+    }
 
     @After
     fun tearDown() {

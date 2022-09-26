@@ -20,6 +20,9 @@ interface MusicDao {
     @Query("DELETE FROM music")
     fun clearMusic()
 
+    @Query("SELECT * FROM music")
+    fun getAll(): List<MusicEntity>
+
     @Query("SELECT * FROM music WHERE trackId == :musicId")
     fun getMusic(musicId: Long): Flow<MusicEntity>
 

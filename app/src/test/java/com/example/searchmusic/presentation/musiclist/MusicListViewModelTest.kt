@@ -38,8 +38,7 @@ class MusicListViewModelTest {
     }
 
     @Test
-    fun `given ViewModel initialize, empty state should be shown`() = runBlocking {
-
+    fun emptyStateShouldBeEmittedWhereViewModelIsInitialized() = runBlocking {
         SUT = MusicListViewModel(
             savedStateHandle = savedInstanceStateHandle, repository = repository
         ).also {
@@ -52,7 +51,7 @@ class MusicListViewModelTest {
     }
 
     @Test
-    fun `given ViewModel initialized, when search is clicked, then  state should updated with latest query`() =
+    fun stateShouldBeUpdatedWithLatestQueryUponClickingSearch() =
         runTest {
             SUT.state.test {
                 val firstItem = awaitItem()
@@ -65,7 +64,7 @@ class MusicListViewModelTest {
         }
 
     @Test
-    fun `give Paging Data, when repo have data, list should be returned`() = runTest {
+    fun listShouldBeReturnedWhenThereIsData() = runTest {
         val musicList = listOfMusic
         val musicUiModelList = musicList.map { it.toUiModel() }
 

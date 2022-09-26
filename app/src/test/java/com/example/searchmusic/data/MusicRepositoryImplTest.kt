@@ -28,7 +28,7 @@ class MusicRepositoryImplTest {
     }
 
     @Test
-    fun `given SearchFor Music invoked, music list should be returned`() = runTest {
+    fun searchForMusicReturnsListWhenThereIsData() = runTest {
         coEvery {
             apiService.searchForMusic(
                 query = any(), offSet = any(), limit = any()
@@ -41,7 +41,7 @@ class MusicRepositoryImplTest {
     }
 
     @Test
-    fun `given SearchFor Music invoked, when searchForMusic throws exception, exception should be thrown`() =
+    fun searchForMusicReturnsExceptionWhenApiServiceThrowsException() =
         runTest {
             val exception = UnknownHostException()
 
@@ -60,7 +60,7 @@ class MusicRepositoryImplTest {
         }
 
     @Test
-    fun `given getMusic Music invoked, then return MusicEntity`() = runTest {
+    fun getMusicReturnsMusicEntityWhenThereIsOne() = runTest {
         val musicEntity = listOfMusic.first()
         coEvery {
             database.musicDao().getMusic(any())
@@ -74,7 +74,7 @@ class MusicRepositoryImplTest {
     }
 
     @Test
-    fun `given insertAll, musicDao insertAll should be invoked`() = runTest {
+    fun daoInsertAllIsCalledWhenInsertAllIsCalled() = runTest {
         coEvery {
             database.musicDao().insertAll(any())
         } returns Unit

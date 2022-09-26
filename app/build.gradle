@@ -102,6 +102,7 @@ dependencies {
     androidTestImplementation "io.mockk:mockk-agent-jvm:$mockKVersion"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
     androidTestImplementation "io.mockk:mockk-android:$mockKVersion"
+    androidTestImplementation "app.cash.turbine:turbine:$turbineVersion"
     androidTestImplementation "androidx.arch.core:core-testing:$androidCoreTestVersion"
 
 
