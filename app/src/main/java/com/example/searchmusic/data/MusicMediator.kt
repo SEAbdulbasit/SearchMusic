@@ -6,9 +6,10 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.searchmusic.data.MusicRepositoryImpl.Companion.NETWORK_PAGE_SIZE
+import com.example.searchmusic.data.database.MusicDatabase
 import com.example.searchmusic.data.database.model.MusicEntity
 import com.example.searchmusic.data.database.model.MusicKeys
-import com.example.searchmusic.domain.MusicRepository
+import com.example.searchmusic.data.network.MusicApiService
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -16,7 +17,9 @@ const val MUSIC_STARTING_PAGE_INDEX = 0
 
 @OptIn(ExperimentalPagingApi::class)
 class MusicMediator(
-    private val query: String, private val repository: MusicRepository
+    private val query: String,
+    private val apiService: MusicApiService,
+    private val database: MusicDatabase
 ) : RemoteMediator<Int, MusicEntity>() {
 
     private var lastPageIndex = 0
@@ -55,16 +58,16 @@ class MusicMediator(
             }
 
             val apiResponse =
-                repository.searchForMusic(query = query, offSet = page, state.config.pageSize)
+                apiService.searchForMusic(query = query, offSet = page, state.config.pageSize)
 
             val musicList = apiResponse.results ?: emptyList()
             val endOfPaginationReached = musicList.size < NETWORK_PAGE_SIZE
 
-            repository.getDataBase().withTransaction {
+            database.withTransaction {
                 // clear all tables in the database
                 if (loadType == LoadType.REFRESH) {
-                    repository.clearMusic()
-                    repository.clearKeys()
+                    database.musicDao().clearMusic()
+                    database.musicKeyDao().clearKeys()
                 }
                 val prevKey =
                     if (page == MUSIC_STARTING_PAGE_INDEX) null else page - NETWORK_PAGE_SIZE
@@ -85,8 +88,8 @@ class MusicMediator(
                         previewUrl = it.previewUrl
                     )
                 }
-                repository.insertAll(musicEntitiesList)
-                repository.insertAllKeys(keys)
+                database.musicDao().insertAll(musicEntitiesList)
+                database.musicKeyDao().insertAll(keys)
             }
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (exception: IOException) {
@@ -106,20 +109,20 @@ class MusicMediator(
     ): MusicKeys? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.trackId?.let { trackingId ->
-                repository.getMusicKey(trackingId)
+                database.musicKeyDao().getMusicKey(trackingId)
             }
         }
     }
 
     private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, MusicEntity>): MusicKeys? {
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()?.let { music ->
-            repository.getMusicKey(music.trackId)
+            database.musicKeyDao().getMusicKey(music.trackId)
         }
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, MusicEntity>): MusicKeys? {
         return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()?.let { music ->
-            repository.getMusicKey(music.trackId)
+            database.musicKeyDao().getMusicKey(music.trackId)
         }
     }
 }

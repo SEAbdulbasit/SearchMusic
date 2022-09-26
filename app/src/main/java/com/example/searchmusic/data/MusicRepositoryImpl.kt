@@ -22,14 +22,10 @@ class MusicRepositoryImpl(
             config = PagingConfig(NETWORK_PAGE_SIZE, enablePlaceholders = false),
             initialKey = null,
             remoteMediator = MusicMediator(
-                query = query, repository = this
+                query = query, apiService = apiService, database = database
             ),
             pagingSourceFactory = pagingSourceFactory
         ).flow
-    }
-
-    override suspend fun getDataBase(): MusicDatabase {
-        return database
     }
 
     override suspend fun searchForMusic(query: String, offSet: Int, pageSize: Int): SearchResults =

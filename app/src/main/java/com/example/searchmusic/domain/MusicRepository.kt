@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface MusicRepository {
     suspend fun getSearchFlow(query: String): Flow<PagingData<MusicEntity>>
-    suspend fun getDataBase(): MusicDatabase
     suspend fun searchForMusic(query: String, offSet: Int, pageSize: Int): SearchResults
     suspend fun insertAll(musicList: List<MusicEntity>)
     suspend fun getMusic(musicId: Long): Flow<MusicEntity>
