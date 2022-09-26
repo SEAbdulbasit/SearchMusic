@@ -15,7 +15,7 @@ plugins {
 
 ext {
     compileSdkVersion = 32
-    minSdkVersion = 16
+    minSdkVersion = 21
     targetSdkVersion = 31
     recyclerViewVersion = '1.2.1'
     multiDex = '1.0.3'
@@ -24,7 +24,7 @@ ext {
     okhttpLoggingInterceptorVersion = '5.0.0-alpha.10'
     navigation = '2.5.2'
     supportLibVersion = '1.5.1'
-    coreVersion = '1.8.0'
+    coreVersion = '1.9.0'
     recyclerViewVersion = '1.2.1'
     constraintLayoutVersion = '2.1.4'
     materialVersion = '1.6.1'
@@ -40,4 +40,15 @@ ext {
     mockKVersion = '1.13.1'
     jUnitVersion = '4.13.2'
     turbineVersion = '0.11.0'
+    mockitoCore = '4.8.0'
+
+
+    androidTestVersion = '1.4.0'
+    espressoVersion = '3.4.0'
+    androidTestVersion = '1.4.0'
+    junitExtversion = '1.1.3'
+    espressoVersion = '3.4.0'
+    mockKVersion = '1.13.1'
+    androidCoreTestVersion = '2.1.0'
+
 }
