@@ -8,8 +8,9 @@ import com.example.searchmusic.data.network.MusicApiService
 import com.example.searchmusic.data.network.response.SearchResults
 import com.example.searchmusic.domain.MusicRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class MusicRepositoryImpl(
+class MusicRepositoryImpl @Inject constructor(
     private val database: MusicDatabase, private val apiService: MusicApiService
 ) : MusicRepository {
 
