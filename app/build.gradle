@@ -48,51 +48,43 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "com.google.android.material:material:$materialVersion"
-
-    // architecture components
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion"
     implementation "androidx.core:core-ktx:$coreVersion"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-ktx:$roomVersion"
     implementation "androidx.paging:paging-runtime-ktx:$pagingVersion"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeToRefresh"
 
-    //for mac
-    kapt "org.xerial:sqlite-jdbc:3.34.0"
-    kapt "androidx.room:room-compiler:2.3.0-beta01"
+    //room
+    implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    implementation "androidx.room:room-paging:$roomVersion"
+    kapt "org.xerial:sqlite-jdbc:$jdbcVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
 
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-    implementation "com.squareup.retrofit2:retrofit-mock:$retrofitVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttpLoggingInterceptorVersion"
 
+    //hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     kapt "com.google.dagger:hilt-compiler:$hiltVersion"
 
+    //glide
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
 
+    //exoplayer
     implementation "com.google.android.exoplayer:exoplayer:$expoplayerVersion"
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation "com.android.support:multidex:$multiDex"
 
     // optional - Test helpers
     testImplementation "androidx.room:room-testing:$roomVersion"
-    testImplementation "io.mockk:mockk:1.12.5"
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    testImplementation "io.mockk:mockk:$mockKVersion"
+    testImplementation "junit:junit:$jUnitVersion"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
-    testImplementation 'app.cash.turbine:turbine:0.11.0'
-    androidTestImplementation "androidx.test:runner:1.4.0"
-    androidTestImplementation "aandroidx.test:rules:1.4.1-alpha07"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.4.0"
-    androidTestImplementation "io.mockk:mockk:1.12.5"
-    androidTestImplementation "androidx.test.uiautomator:uiautomator:2.3.0-alpha01"
-    testImplementation "androidx.test:core-ktx:1.4.0"
+    testImplementation "app.cash.turbine:turbine:$turbineVersion"
 
 
 }
