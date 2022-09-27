@@ -34,7 +34,7 @@ class MusicListAdapter(
             binding.artistName.text = item.artisName
             binding.albumName.text = item.albumName
             Glide.with(binding.imageView).load(item.imageUrl)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(R.drawable.image_placeholder).into(binding.imageView)
 
             binding.root.setOnClickListener {

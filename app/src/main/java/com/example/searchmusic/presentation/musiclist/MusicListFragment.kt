@@ -1,9 +1,11 @@
 package com.example.searchmusic.presentation.musiclist
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -19,7 +21,7 @@ import com.example.searchmusic.navigateSafe
 import com.example.searchmusic.presentation.musicdetail.MUSIC_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class MusicListFragment : Fragment() {
@@ -42,7 +44,10 @@ class MusicListFragment : Fragment() {
         bindState(
             uiState = viewModel.state, pagingData = viewModel.pagingDataFlow, uiActions = {
                 viewModel.processActions(it)
-            }, navigateToDetailsScreen = ::navigateToDetailsPage
+            }, navigateToDetailsScreen = {
+                hideKeyboard()
+                navigateToDetailsPage(it)
+            }
         )
     }
 
@@ -57,9 +62,7 @@ class MusicListFragment : Fragment() {
         }
         if (itemDetailFragmentContainer != null) {
             navigateSafe(
-                itemDetailFragmentContainer.findNavController(),
-                R.id.fragment_music_detail,
-                bundle
+                itemDetailFragmentContainer.findNavController(), R.id.fragment_music_detail, bundle
             )
         } else {
             view?.findNavController()?.let { navigateSafe(it, R.id.show_music_detail, bundle) }
@@ -97,10 +100,11 @@ class MusicListFragment : Fragment() {
     ) {
 
         binding.search.setOnClickListener {
+            hideKeyboard()
             updateRepoListFromInput(onQueryChanged)
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenResumed {
             uiState.map { it.query }.distinctUntilChanged().collect {
                 binding.searchEditText.setText(it)
             }
@@ -189,9 +193,19 @@ class MusicListFragment : Fragment() {
         }
     }
 
+    private fun hideKeyboard() {
+        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        imm?.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         _binding = null
     }
 

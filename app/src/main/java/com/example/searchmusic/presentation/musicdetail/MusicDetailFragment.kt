@@ -78,7 +78,7 @@ class MusicDetailFragment : Fragment() {
             musicLogo.isVisible = false
             musicDetailView.isVisible = true
             Glide.with(image).load(uiModel.imageUrl).placeholder(R.drawable.image_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(image)
             musicTitle.text = uiModel.musicTitle
             artisName.text = uiModel.artisName
