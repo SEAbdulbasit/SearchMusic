@@ -26,7 +26,7 @@ class MusicDetailFragment : Fragment() {
 
     private var _binding: FragmentMusicDetailBinding? = null
     private val binding get() = _binding!!
-    private lateinit var exoPlayer: ExoPlayer
+    private var exoPlayer: ExoPlayer? = null
 
     private val KEY_POSITION = "position"
     private val KEY_AUTO_PLAY = "auto_play"
@@ -78,8 +78,7 @@ class MusicDetailFragment : Fragment() {
             musicLogo.isVisible = false
             musicDetailView.isVisible = true
             Glide.with(image).load(uiModel.imageUrl).placeholder(R.drawable.image_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .into(image)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(image)
             musicTitle.text = uiModel.musicTitle
             artisName.text = uiModel.artisName
             albumName.text = uiModel.albumName
@@ -110,26 +109,30 @@ class MusicDetailFragment : Fragment() {
 
     private fun play(audioUrl: String) {
         val mediaItem: MediaItem = MediaItem.fromUri(audioUrl)
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.prepare()
-        exoPlayer.seekTo(startPosition)
-        exoPlayer.playWhenReady = startAutoPlay
+        exoPlayer?.let { player ->
+            player.setMediaItem(mediaItem)
+            player.prepare()
+            player.seekTo(startPosition)
+            player.playWhenReady = startAutoPlay
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        exoPlayer.pause()
+        exoPlayer?.pause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_AUTO_PLAY, exoPlayer.playWhenReady)
-        outState.putLong(KEY_POSITION, exoPlayer.currentPosition)
+        exoPlayer?.let { player ->
+            outState.putBoolean(KEY_AUTO_PLAY, player.playWhenReady)
+            outState.putLong(KEY_POSITION, player.currentPosition)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        exoPlayer.release()
+        exoPlayer?.release()
         _binding = null
     }
 }
