@@ -49,5 +49,8 @@ ext {
     espressoVersion = '3.4.0'
     mockKVersion = '1.13.1'
     androidCoreTestVersion = '2.1.0'
+    fragmentTesting = '1.6.0-alpha02'
+    androidXTest = '1.1.0'
+    androidCore='1.8.0'
 
 }
