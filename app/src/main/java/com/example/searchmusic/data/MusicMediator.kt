@@ -53,8 +53,8 @@ class MusicMediator(
         }
 
         try {
-            //sometimes it tries to get key from db but db returns previous keys as of nex key due to entries in db
 
+            //sometimes it tries to get key from db but db returns previous keys as of nex key due to entries in db
             if (page < lastPageIndex) {
                 page = lastPageIndex
             }
@@ -63,7 +63,7 @@ class MusicMediator(
                 apiService.searchForMusic(query = query, offSet = page, state.config.pageSize)
 
             val musicList = apiResponse.results ?: emptyList()
-            val endOfPaginationReached = musicList.size < NETWORK_PAGE_SIZE
+            val endOfPaginationReached = (apiResponse.resultCount ?: 0) < NETWORK_PAGE_SIZE
 
             database.withTransaction {
                 // clear all tables in the database

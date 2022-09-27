@@ -25,7 +25,7 @@ class MusicRepositoryImpl @Inject constructor(
             remoteMediator = MusicMediator(
                 query = query, apiService = apiService, database = database
             ),
-            pagingSourceFactory = pagingSourceFactory
+            pagingSourceFactory = pagingSourceFactory,
         ).flow
     }
 

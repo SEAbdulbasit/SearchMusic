@@ -17,6 +17,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/primary_details_nav_graph"
-        tools:layout="@layout/fragment_item_detail" />
+        tools:layout="@layout/fragment_music_detail" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

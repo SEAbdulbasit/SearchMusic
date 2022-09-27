@@ -21,7 +21,8 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         tools:context=".ItemDetailHostActivity"
-        tools:ignore="MergeRootFrame">
+        tools:ignore="MergeRootFrame"
+        tools:visibility="visible">
 
         <com.google.android.exoplayer2.ui.PlayerControlView
             android:id="@+id/ep_audio_view"
