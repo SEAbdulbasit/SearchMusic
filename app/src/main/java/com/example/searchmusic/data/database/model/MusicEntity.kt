@@ -15,7 +15,6 @@ data class MusicEntity(
     val timeStamp: Long = System.currentTimeMillis()
 )
 
-
 fun MusicEntity.toUiModel() = MusicUiModel(
     trackId = this.trackId,
     artisName = this.artisName,

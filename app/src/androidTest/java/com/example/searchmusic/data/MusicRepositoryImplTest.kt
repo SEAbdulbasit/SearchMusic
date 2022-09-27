@@ -53,7 +53,6 @@ class MusicRepositoryImplTest {
         assertEquals(entitiesList.size, dbItems.size)
     }
 
-
     @Test
     fun musicDetailsIsReturnedWhereThereIsData() = runTest {
         coEvery { apiService.searchForMusic(any(), any(), any()) } returns getSearchResults()

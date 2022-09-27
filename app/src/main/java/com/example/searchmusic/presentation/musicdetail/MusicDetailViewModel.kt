@@ -53,4 +53,4 @@ class MusicDetailViewModel @Inject constructor(
     }
 }
 
-const val MUSIC_ID = "music_id"
+const val MUSIC_ID = "music-id"

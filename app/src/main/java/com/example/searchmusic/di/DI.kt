@@ -18,7 +18,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class Module {
+abstract class AppModule {
 
     @Singleton
     @Binds
@@ -34,7 +34,7 @@ abstract class Module {
         @Singleton
         @Provides
         fun provideAppDatabase(context: Application): MusicDatabase = Room.databaseBuilder(
-            context, MusicDatabase::class.java, "task-db"
+            context, MusicDatabase::class.java, "music-db"
         ).fallbackToDestructiveMigration().build()
 
         @Singleton
