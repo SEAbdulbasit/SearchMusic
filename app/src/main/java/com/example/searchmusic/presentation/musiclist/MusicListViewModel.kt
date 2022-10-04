@@ -33,12 +33,12 @@ class MusicListViewModel @Inject constructor(
                 .onStart { emit(MusicListActions.Search(query = initialQuery)) }
 
         val scrolled =
-            actionStateFlow.filterIsInstance<MusicListActions.Scroll>().distinctUntilChanged()
-                .shareIn(
+            actionStateFlow.filterIsInstance<MusicListActions.Scroll>()
+                .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-                    replay = 1
-                ).onStart { emit(MusicListActions.Scroll(query = lastQueryScrolled)) }
+                    initialValue = MusicListActions.Scroll(lastQueryScrolled)
+                )
 
         pagingDataFlow =
             searches.flatMapLatest { searchMusic(queryString = it.query) }.cachedIn(viewModelScope)
