@@ -8,6 +8,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -17,8 +19,10 @@ import com.example.searchmusic.presentation.musiclist.MusicUiModel
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.ViewModelLifecycle
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -57,10 +61,11 @@ class MusicDetailFragment : Fragment() {
     }
 
     private fun bindState(uiState: SharedFlow<MusicDetailScreenState>) {
-        lifecycleScope.launchWhenResumed {
-            uiState.distinctUntilChanged().collect { musicDetailsState ->
-                bindScreen(musicDetailsState.uiMModel)
-            }
+        lifecycleScope.launch {
+            uiState.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collect { musicDetailsState ->
+                    bindScreen(musicDetailsState.uiMModel)
+                }
         }
     }
 
