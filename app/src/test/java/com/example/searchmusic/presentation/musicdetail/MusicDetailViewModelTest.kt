@@ -35,7 +35,7 @@ class MusicDetailViewModelTest {
     }
 
     @Test
-    fun emptyStateShouldBeEmittedWhenViewModelInitialize(): Unit = runBlocking {
+    fun emptyStateShouldBeEmittedWhenViewModelInitialize(): Unit = runTest {
         SUT = MusicDetailViewModel(
             repository = repository, savedStateHandle = savedInstanceStateHandle
         )
