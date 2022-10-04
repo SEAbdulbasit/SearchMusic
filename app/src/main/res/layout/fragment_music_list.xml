@@ -85,10 +85,10 @@
                 android:layout_height="wrap_content"
                 android:text="No items found"
                 android:visibility="gone"
-                app:layout_constraintBottom_toTopOf="@+id/btn_retry"
+                app:layout_constraintBottom_toTopOf="@+id/load_more"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/music_list"
-                app:layout_constraintTop_toBottomOf="@+id/search_edit_text" />
+                app:layout_constraintTop_toBottomOf="@+id/search_input_layout" />
 
             <Button
                 android:id="@+id/btn_retry"

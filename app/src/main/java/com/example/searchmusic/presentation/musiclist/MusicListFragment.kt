@@ -10,7 +10,9 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -20,7 +22,13 @@ import com.example.searchmusic.databinding.FragmentMusicListBinding
 import com.example.searchmusic.navigateSafe
 import com.example.searchmusic.presentation.musicdetail.MUSIC_ID
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -142,52 +150,55 @@ class MusicListFragment : Fragment() {
             uiState.map { it.hasNotScrolledForCurrentSearch }.distinctUntilChanged()
 
         val shouldScrollToTop = combine(
-            notLoading, hasNotScrolledForCurrentSearch, Boolean::and
+            notLoading, hasNotScrolledForCurrentSearch, Boolean::or
         ).distinctUntilChanged()
 
-        lifecycleScope.launchWhenResumed {
-            pagingData.collectLatest(musicListAdapter::submitData)
-        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    pagingData.collectLatest(musicListAdapter::submitData)
+                }
+                launch {
+                    shouldScrollToTop.collect { shouldScroll ->
+                        if (shouldScroll) binding.musicList.scrollToPosition(0)
+                    }
+                }
+                launch {
+                    musicListAdapter.loadStateFlow.collect { loadState ->
+                        // Show a retry header if there was an error refreshing, and items were previously
+                        // cached OR default to the default prepend state
 
-        lifecycleScope.launchWhenResumed {
-            shouldScrollToTop.collect { shouldScroll ->
-                if (shouldScroll) binding.musicList.scrollToPosition(0)
-            }
-        }
+                        val isListEmpty =
+                            loadState.refresh is LoadState.NotLoading && musicListAdapter.itemCount == 0
+                        // show empty list
+                        binding.emptyList.isVisible = isListEmpty
 
-        lifecycleScope.launchWhenResumed {
-            musicListAdapter.loadStateFlow.collect { loadState ->
-                // Show a retry header if there was an error refreshing, and items were previously
-                // cached OR default to the default prepend state
+                        //only show swipe refreshing on
+                        if (loadState.mediator?.refresh != LoadState.Loading) binding.swipeRefresh.isRefreshing =
+                            loadState.mediator?.refresh is LoadState.Loading
 
-                val isListEmpty =
-                    loadState.refresh is LoadState.NotLoading && musicListAdapter.itemCount == 0
-                // show empty list
-                binding.emptyList.isVisible = isListEmpty
+                        // Only show the list if refresh succeeds, either from the the local db or the remote.
+                        binding.musicList.isVisible =
+                            loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
 
-                //only show swipe refreshing on
-                if (loadState.mediator?.refresh != LoadState.Loading) binding.swipeRefresh.isRefreshing =
-                    loadState.mediator?.refresh is LoadState.Loading
+                        binding.btnRetry.isVisible =
+                            loadState.mediator?.refresh is LoadState.Error && musicListAdapter.itemCount == 0
 
-                // Only show the list if refresh succeeds, either from the the local db or the remote.
-                binding.musicList.isVisible =
-                    loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
+                        // Show loading spinner during initial load or refresh.
+                        binding.initialLoader.isVisible =
+                            loadState.mediator?.refresh is LoadState.Loading && !(binding.swipeRefresh.isRefreshing)
 
-                binding.btnRetry.isVisible =
-                    loadState.mediator?.refresh is LoadState.Error && musicListAdapter.itemCount == 0
-
-                // Show loading spinner during initial load or refresh.
-                binding.initialLoader.isVisible =
-                    loadState.mediator?.refresh is LoadState.Loading && !(binding.swipeRefresh.isRefreshing)
-
-                val errorState = loadState.source.append as? LoadState.Error
-                    ?: loadState.source.prepend as? LoadState.Error
-                    ?: loadState.append as? LoadState.Error ?: loadState.prepend as? LoadState.Error
-                errorState?.let {
-                    it.error.printStackTrace()
-                    Toast.makeText(
-                        context, "Something went wrong", Toast.LENGTH_LONG
-                    ).show()
+                        val errorState = loadState.source.append as? LoadState.Error
+                            ?: loadState.source.prepend as? LoadState.Error
+                            ?: loadState.append as? LoadState.Error
+                            ?: loadState.prepend as? LoadState.Error
+                        errorState?.let {
+                            it.error.printStackTrace()
+                            Toast.makeText(
+                                context, "Something went wrong", Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
                 }
             }
         }
