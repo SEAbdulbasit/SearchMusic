@@ -209,15 +209,9 @@ class MusicListFragment : Fragment() {
         imm?.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.musicList.adapter = null
         _binding = null
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
 }
