@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.searchmusic.domain.MusicRepository
+import com.example.searchmusic.presentation.MediaPlayerServices
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -13,23 +14,28 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicDetailViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle, private val repository: MusicRepository
+    private val savedStateHandle: SavedStateHandle,
+    private val repository: MusicRepository,
+    private val mediaPlayerService: MediaPlayerServices
 ) : ViewModel() {
 
+    private val keyPosition = savedStateHandle.get<Long>(KEY_POSITION) ?: 0
     val state: StateFlow<MusicDetailScreenState>
 
     init {
         val musicDetails = savedStateHandle.getStateFlow<Long>(MUSIC_ID, -1).filter { it != -1L }
-            .flatMapLatest { getMusicDetails(it) }
+            .flatMapLatest { getMusicDetails(it) }.onEach { musicUiModel ->
+                mediaPlayerService.playMedia(musicUiModel.previewUrl, keyPosition)
+            }
 
         state = musicDetails.map { music ->
             MusicDetailScreenState(
-                uiMModel = music
+                uiMModel = music, exoPlayer = mediaPlayerService.exoPlayer
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            initialValue = MusicDetailScreenState()
+            initialValue = MusicDetailScreenState(exoPlayer = mediaPlayerService.exoPlayer)
         )
     }
 
@@ -48,9 +54,12 @@ class MusicDetailViewModel @Inject constructor(
 
     override fun onCleared() {
         savedStateHandle[MUSIC_ID] = state.value.uiMModel.trackId
+        savedStateHandle[KEY_POSITION] = state.value.exoPlayer.currentPosition
+        mediaPlayerService.exoPlayer.release()
         viewModelScope.cancel()
         super.onCleared()
     }
 }
 
 const val MUSIC_ID = "music_id"
+const val KEY_POSITION = "key_position"

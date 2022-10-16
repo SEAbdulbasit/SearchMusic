@@ -16,12 +16,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.FragmentMusicDetailBinding
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.ViewModelLifecycle
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 
@@ -30,21 +27,14 @@ class MusicDetailFragment : Fragment() {
 
     private var _binding: FragmentMusicDetailBinding? = null
     private val binding get() = _binding!!
-    private var exoPlayer: ExoPlayer? = null
-
-    private val KEY_POSITION = "position"
-    private val KEY_AUTO_PLAY = "auto_play"
-
-    private var startAutoPlay = false
-    private var startPosition: Long = 0
+    private var mediaWasPlaying = false
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val viewModel: MusicDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startAutoPlay = savedInstanceState?.getBoolean(KEY_AUTO_PLAY) ?: true
-        startPosition = savedInstanceState?.getLong(KEY_POSITION) ?: 0L
+        mediaWasPlaying = savedInstanceState?.getBoolean(IS_MEDIA_PLAYING, false) == true
     }
 
     override fun onCreateView(
@@ -56,8 +46,14 @@ class MusicDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initializePlayer()
+        initializePlayer(viewModel.state)
         bindState(viewModel.state)
+    }
+
+    private fun initializePlayer(state: StateFlow<MusicDetailScreenState>) {
+        binding.epAudioView.player = state.value.exoPlayer
+        binding.epAudioView.setShowNextButton(false)
+        binding.epAudioView.setShowPreviousButton(false)
     }
 
     private fun bindState(uiState: SharedFlow<MusicDetailScreenState>) {
@@ -72,7 +68,6 @@ class MusicDetailFragment : Fragment() {
     private fun bindScreen(uiModel: MusicUiModel) {
         if (uiModel.artisName.isNotEmpty()) {
             bindMusicDetail(uiModel)
-            bindExoPlayer(uiModel)
         } else {
             bindEmptyState()
         }
@@ -90,14 +85,6 @@ class MusicDetailFragment : Fragment() {
         }
     }
 
-    private fun bindExoPlayer(uiMModel: MusicUiModel) {
-        uiMModel.previewUrl.trim().let {
-            if (it.isNotEmpty()) {
-                play(it)
-            }
-        }
-    }
-
     private fun bindEmptyState() {
         with(binding) {
             musicDetailView.isVisible = false
@@ -105,39 +92,28 @@ class MusicDetailFragment : Fragment() {
         }
     }
 
-    private fun initializePlayer() {
-        exoPlayer = ExoPlayer.Builder(requireContext()).build()
-        binding.epAudioView.player = exoPlayer
-        binding.epAudioView.setShowNextButton(false)
-        binding.epAudioView.setShowPreviousButton(false)
-    }
-
-    private fun play(audioUrl: String) {
-        val mediaItem: MediaItem = MediaItem.fromUri(audioUrl)
-        exoPlayer?.let { player ->
-            player.setMediaItem(mediaItem)
-            player.prepare()
-            player.seekTo(startPosition)
-            player.playWhenReady = startAutoPlay
-        }
-    }
-
     override fun onPause() {
         super.onPause()
-        exoPlayer?.pause()
+        mediaWasPlaying = binding.epAudioView.player?.isPlaying ?: false
+        binding.epAudioView.player?.pause()
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mediaWasPlaying)
+            binding.epAudioView.player?.play()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        exoPlayer?.let { player ->
-            outState.putBoolean(KEY_AUTO_PLAY, player.playWhenReady)
-            outState.putLong(KEY_POSITION, player.currentPosition)
-        }
+        outState.putBoolean(IS_MEDIA_PLAYING, mediaWasPlaying)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        exoPlayer?.release()
         _binding = null
     }
 }
+
+const val IS_MEDIA_PLAYING = "is_media_playing"
