@@ -6,13 +6,10 @@ import com.example.searchmusic.data.MusicRepositoryImpl
 import com.example.searchmusic.data.database.MusicDatabase
 import com.example.searchmusic.data.network.MusicApiService
 import com.example.searchmusic.domain.MusicRepository
-import com.example.searchmusic.presentation.MediaPlayerServices
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -50,14 +47,4 @@ abstract class AppModule {
         }
     }
 
-}
-
-@Module
-@InstallIn(ViewModelComponent::class)
-object ViewModelMovieModule {
-    @Provides
-    @ViewModelScoped
-    fun provideMediaPlayServices(context: Application): MediaPlayerServices {
-        return MediaPlayerServices(context)
-    }
 }

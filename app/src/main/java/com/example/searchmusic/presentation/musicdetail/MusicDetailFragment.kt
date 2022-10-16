@@ -1,6 +1,11 @@
 package com.example.searchmusic.presentation.musicdetail
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,10 +20,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.FragmentMusicDetailBinding
+import com.example.searchmusic.presentation.MEDIA
+import com.example.searchmusic.presentation.MediaPlayerService
+import com.example.searchmusic.presentation.SEEK_TO
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 
@@ -27,14 +34,19 @@ class MusicDetailFragment : Fragment() {
 
     private var _binding: FragmentMusicDetailBinding? = null
     private val binding get() = _binding!!
-    private var mediaWasPlaying = false
+    private var mediaWasPlaying = true
+    private var playedPosition = 0L
+
+    private var bindServices: MediaPlayerService.MediaServiceBinder? = null
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val viewModel: MusicDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mediaWasPlaying = savedInstanceState?.getBoolean(IS_MEDIA_PLAYING, false) == true
+        mediaWasPlaying = savedInstanceState?.getBoolean(IS_MEDIA_PLAYING, true) ?: true
+        playedPosition = savedInstanceState?.getLong(KEY_POSITION, 0L) ?: 0L
+
     }
 
     override fun onCreateView(
@@ -46,12 +58,11 @@ class MusicDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initializePlayer(viewModel.state)
+        setPlayerView()
         bindState(viewModel.state)
     }
 
-    private fun initializePlayer(state: StateFlow<MusicDetailScreenState>) {
-        binding.epAudioView.player = state.value.exoPlayer
+    private fun setPlayerView() {
         binding.epAudioView.setShowNextButton(false)
         binding.epAudioView.setShowPreviousButton(false)
     }
@@ -68,6 +79,7 @@ class MusicDetailFragment : Fragment() {
     private fun bindScreen(uiModel: MusicUiModel) {
         if (uiModel.artisName.isNotEmpty()) {
             bindMusicDetail(uiModel)
+            startService(uiModel)
         } else {
             bindEmptyState()
         }
@@ -92,28 +104,59 @@ class MusicDetailFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        mediaWasPlaying = binding.epAudioView.player?.isPlaying ?: false
-        binding.epAudioView.player?.pause()
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+            bindServices = p1 as MediaPlayerService.MediaServiceBinder?
+            val player = bindServices?.getExoPlayer()
+            binding.epAudioView.player = player
+            if (mediaWasPlaying) {
+                player?.play()
+            } else {
+                player?.pause()
+            }
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            bindServices = null
+        }
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (mediaWasPlaying)
-            binding.epAudioView.player?.play()
+    private fun startService(uiModel: MusicUiModel) {
+        val intent = Intent(requireContext(), MediaPlayerService::class.java)
+        intent.putExtra(SEEK_TO, playedPosition)
+        intent.putExtra(MEDIA, uiModel.previewUrl)
+
+        requireContext().bindService(
+            intent, connection, Context.BIND_AUTO_CREATE
+        )
+        requireContext().startService(intent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.epAudioView.player?.let { player ->
+            mediaWasPlaying = player.isPlaying
+            player.pause()
+
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(IS_MEDIA_PLAYING, mediaWasPlaying)
+        binding.epAudioView.player?.let { player ->
+            outState.putBoolean(IS_MEDIA_PLAYING, mediaWasPlaying)
+            outState.putLong(KEY_POSITION, player.currentPosition)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.epAudioView.player = null
+        requireContext().unbindService(connection)
         _binding = null
     }
 }
 
 const val IS_MEDIA_PLAYING = "is_media_playing"
+const val KEY_POSITION = "key_position"
