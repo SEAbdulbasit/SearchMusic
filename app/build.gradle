@@ -61,6 +61,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$roomVersion"
     implementation "androidx.room:room-ktx:$roomVersion"
     implementation "androidx.room:room-paging:$roomVersion"
+    implementation 'androidx.lifecycle:lifecycle-service:2.5.1'
     kapt "org.xerial:sqlite-jdbc:$jdbcVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
 
@@ -110,5 +111,5 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit-ktx:$junitExtversion"
     debugImplementation "androidx.fragment:fragment-testing:$fragmentTesting"
 
-
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 }

@@ -4,38 +4,40 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.searchmusic.domain.MusicRepository
-import com.example.searchmusic.presentation.MediaPlayerServices
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+
 
 @HiltViewModel
 class MusicDetailViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
-    private val repository: MusicRepository,
-    private val mediaPlayerService: MediaPlayerServices
+    private val savedStateHandle: SavedStateHandle, private val repository: MusicRepository
 ) : ViewModel() {
 
-    private val keyPosition = savedStateHandle.get<Long>(KEY_POSITION) ?: 0
     val state: StateFlow<MusicDetailScreenState>
 
     init {
         val musicDetails = savedStateHandle.getStateFlow<Long>(MUSIC_ID, -1).filter { it != -1L }
-            .flatMapLatest { getMusicDetails(it) }.onEach { musicUiModel ->
-                mediaPlayerService.playMedia(musicUiModel.previewUrl, keyPosition)
-            }
+            .flatMapLatest { getMusicDetails(it) }
 
         state = musicDetails.map { music ->
             MusicDetailScreenState(
-                uiMModel = music, exoPlayer = mediaPlayerService.exoPlayer
+                uiMModel = music
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
-            initialValue = MusicDetailScreenState(exoPlayer = mediaPlayerService.exoPlayer)
+            initialValue = MusicDetailScreenState()
         )
     }
 
@@ -53,13 +55,10 @@ class MusicDetailViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        savedStateHandle[MUSIC_ID] = state.value.uiMModel.trackId
-        savedStateHandle[KEY_POSITION] = state.value.exoPlayer.currentPosition
-        mediaPlayerService.exoPlayer.release()
-        viewModelScope.cancel()
         super.onCleared()
+        savedStateHandle[MUSIC_ID] = state.value.uiMModel.trackId
+        viewModelScope.cancel()
     }
 }
 
 const val MUSIC_ID = "music_id"
-const val KEY_POSITION = "key_position"
