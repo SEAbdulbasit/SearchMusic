@@ -127,17 +127,24 @@ class MusicDetailFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        binding.epAudioView.player?.let { player ->
-            outState.putBoolean(IS_MEDIA_PLAYING, mediaWasPlaying)
-            outState.putLong(KEY_POSITION, player.currentPosition)
+        try {
+            binding.epAudioView.player?.let { player ->
+                outState.putBoolean(IS_MEDIA_PLAYING, mediaWasPlaying)
+                outState.putLong(KEY_POSITION, player.currentPosition)
+            }
+        } catch (e: Exception) {
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.epAudioView.player?.release()
-        binding.epAudioView.player = null
-        _binding = null
+        try {
+            Glide.with(this).clear(binding.root);
+            binding.epAudioView.player?.release()
+            binding.epAudioView.player = null
+        } finally {
+            _binding = null
+        }
     }
 }
 
