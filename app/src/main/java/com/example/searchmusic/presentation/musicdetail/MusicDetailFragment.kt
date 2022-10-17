@@ -1,11 +1,6 @@
 package com.example.searchmusic.presentation.musicdetail
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +13,13 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.searchmusic.App.Companion.mCacheDataSourceFactory
 import com.example.searchmusic.R
 import com.example.searchmusic.databinding.FragmentMusicDetailBinding
-import com.example.searchmusic.presentation.MEDIA
-import com.example.searchmusic.presentation.MediaPlayerService
-import com.example.searchmusic.presentation.SEEK_TO
 import com.example.searchmusic.presentation.musiclist.MusicUiModel
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -36,8 +32,6 @@ class MusicDetailFragment : Fragment() {
     private val binding get() = _binding!!
     private var mediaWasPlaying = true
     private var playedPosition = 0L
-
-    private var bindServices: MediaPlayerService.MediaServiceBinder? = null
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val viewModel: MusicDetailViewModel by viewModels()
@@ -58,13 +52,7 @@ class MusicDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setPlayerView()
         bindState(viewModel.state)
-    }
-
-    private fun setPlayerView() {
-        binding.epAudioView.setShowNextButton(false)
-        binding.epAudioView.setShowPreviousButton(false)
     }
 
     private fun bindState(uiState: SharedFlow<MusicDetailScreenState>) {
@@ -79,7 +67,7 @@ class MusicDetailFragment : Fragment() {
     private fun bindScreen(uiModel: MusicUiModel) {
         if (uiModel.artisName.isNotEmpty()) {
             bindMusicDetail(uiModel)
-            startService(uiModel)
+            bindExoPlayer(uiModel)
         } else {
             bindEmptyState()
         }
@@ -97,6 +85,20 @@ class MusicDetailFragment : Fragment() {
         }
     }
 
+    private fun bindExoPlayer(uiModel: MusicUiModel) {
+        val exoPlayer = getExoPlayerWithCache(uiModel.previewUrl)
+        if (mediaWasPlaying) {
+            exoPlayer.play()
+        } else {
+            exoPlayer.pause()
+        }
+        exoPlayer.seekTo(playedPosition)
+        exoPlayer.playWhenReady = mediaWasPlaying
+        binding.epAudioView.player = exoPlayer
+        binding.epAudioView.setShowNextButton(false)
+        binding.epAudioView.setShowPreviousButton(false)
+    }
+
     private fun bindEmptyState() {
         with(binding) {
             musicDetailView.isVisible = false
@@ -104,33 +106,14 @@ class MusicDetailFragment : Fragment() {
         }
     }
 
-    private val connection = object : ServiceConnection {
-        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            bindServices = p1 as MediaPlayerService.MediaServiceBinder?
-            val player = bindServices?.getExoPlayer()
-            binding.epAudioView.player = player
-            if (mediaWasPlaying) {
-                player?.play()
-            } else {
-                player?.pause()
-            }
-        }
-
-        override fun onServiceDisconnected(p0: ComponentName?) {
-            bindServices = null
-        }
-
-    }
-
-    private fun startService(uiModel: MusicUiModel) {
-        val intent = Intent(requireContext(), MediaPlayerService::class.java)
-        intent.putExtra(SEEK_TO, playedPosition)
-        intent.putExtra(MEDIA, uiModel.previewUrl)
-
-        requireContext().bindService(
-            intent, connection, Context.BIND_AUTO_CREATE
-        )
-        requireContext().startService(intent)
+    private fun getExoPlayerWithCache(previewUrl: String): ExoPlayer {
+        val exoPlayer = ExoPlayer.Builder(requireContext()).build()
+        val mediaItem: MediaItem = MediaItem.fromUri(previewUrl)
+        val mediaSource =
+            ProgressiveMediaSource.Factory(mCacheDataSourceFactory).createMediaSource(mediaItem)
+        exoPlayer.setMediaSource(mediaSource)
+        exoPlayer.prepare()
+        return exoPlayer
     }
 
     override fun onPause() {
@@ -152,8 +135,8 @@ class MusicDetailFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.epAudioView.player?.release()
         binding.epAudioView.player = null
-        requireContext().unbindService(connection)
         _binding = null
     }
 }
