@@ -18,7 +18,6 @@
             android:name=".HiltTestActivity"
             android:exported="false"
             android:theme="@style/Theme.SearchMusic" />
-        <service android:name=".presentation.MediaPlayerService"/>
         <activity
             android:name=".ItemDetailHostActivity"
             android:exported="true"
