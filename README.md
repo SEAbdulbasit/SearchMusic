@@ -1,5 +1,5 @@
 # SearchMusic
-
+This is a project to explore ExoPlayer and implement clean architecture.
 <h1>Tablet Mode</h1>
 
 ![Screenshot_20220927_143208](https://user-images.githubusercontent.com/33172684/192490689-9afeccea-dd0c-4501-9129-dd54ff3b9b4a.png)
