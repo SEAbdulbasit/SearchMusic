@@ -13,7 +13,12 @@ data class MusicUiModel(
     val artisName: String,
     val imageUrl: String,
     val previewUrl: String
-)
+){
+    fun getLargePreview(): String {
+        return imageUrl.replace(
+            "100", "460")
+    }
+}
 
 fun getEmptyMusicUiModel() =
     MusicUiModel(

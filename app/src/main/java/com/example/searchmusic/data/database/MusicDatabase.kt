@@ -7,7 +7,7 @@ import com.example.searchmusic.data.database.model.MusicKeys
 
 
 @Database(
-    entities = [MusicEntity::class, MusicKeys::class], version = 1
+    entities = [MusicEntity::class, MusicKeys::class], version = 1, exportSchema = false
 )
 abstract class MusicDatabase : RoomDatabase() {
     abstract fun musicDao(): MusicDao

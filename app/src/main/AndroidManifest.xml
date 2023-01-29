@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".MusicApp"
         android:allowBackup="true"
@@ -15,6 +16,17 @@
         android:theme="@style/Theme.SearchMusic"
         tools:targetApi="31">
         <activity
+            android:name=".composepresentationlayer.ComposeActivity"
+            android:exported="true"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.SearchMusic">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".HiltTestActivity"
             android:exported="false"
             android:theme="@style/Theme.SearchMusic" />
@@ -26,6 +38,7 @@
             tools:targetApi="24">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 

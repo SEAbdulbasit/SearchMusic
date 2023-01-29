@@ -10,7 +10,19 @@ import com.example.searchmusic.domain.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,6 +44,11 @@ class MusicListViewModel @Inject constructor(
             actionStateFlow.filterIsInstance<MusicListActions.Search>().distinctUntilChanged()
                 .onStart { emit(MusicListActions.Search(query = initialQuery)) }
 
+        val textChanged =
+            actionStateFlow.filterIsInstance<MusicListActions.OnQueryChange>()
+                .distinctUntilChanged()
+                .onStart { emit(MusicListActions.OnQueryChange(query = initialQuery)) }
+
         val scrolled =
             actionStateFlow.filterIsInstance<MusicListActions.Scroll>()
                 .stateIn(
@@ -46,9 +63,9 @@ class MusicListViewModel @Inject constructor(
 
                 }
 
-        state = combine(searches, scrolled) { search, scrolled ->
+        state = combine(searches, scrolled, textChanged) { search, scrolled, searchText ->
             MusicScreenState(
-                query = search.query,
+                query = searchText.query,
                 lastQueryScrolled = scrolled.query,
                 hasNotScrolledForCurrentSearch = search.query != scrolled.query
             )
